@@ -8,7 +8,6 @@
  * @license		Apache License V.2.0
  */
 class Incentibox {
-	// internal constant to enable/disable debugging
 	const DEBUG = false;
 	const INCENTIBOX_API_URL = 'http://incentibox.dev/api'; //'http://api.incentibox.com';
 	const INCENTIBOX_API_PORT = 80;
@@ -33,19 +32,16 @@ class Incentibox {
 		$use_post = (bool) $use_post;
 
 		// build url
-		$url = self::INCENTIBOX_API_URL .'/v'. self::API_VERSION .  $url;
+		$url = self::INCENTIBOX_API_URL .'/v'. self::API_VERSION . '/' . $url;
 
 		// validate needed authentication
-		if($authenticate && ($this->getUsername() == '' || $this->get_password() == '')) {
+		if($authenticate && ($this->get_username() == '' || $this->get_password() == '')) {
 			throw new IncentiboxException('No username or password was set.');
 		}
 
 		// build GET URL if not using post
 		if(!empty($params) && !$use_post){
-			$queryString = '';
-			foreach($aParameters as $key => $value) $queryString .= '&'. $key .'='. urlencode(utf8_encode($value));
-			$queryString = trim($queryString, '&');
-			$url .= '?'. $queryString;
+			$url .= '?'. http_build_query( $params );
 		}
 
 		// set options
@@ -59,31 +55,32 @@ class Incentibox {
 		// HTTP basic auth
 		if($authenticate) {
 			$options[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
-			$options[CURLOPT_USERPWD] = $this->getUsername() .':'. $this->get_password();
+			$options[CURLOPT_USERPWD] = $this->get_username() .':'. $this->get_password();
 		}
 
 		// build post params if $use_post
 		if(!empty($params) && $use_post) {
-			$var = '';
-			foreach($params as $key => $value) $var .= '&'. $key .'='. urlencode($value);
 			$options[CURLOPT_POST] = true;
-			$options[CURLOPT_POSTFIELDS] = trim($var, '&');
+			$options[CURLOPT_POSTFIELDS] = http_build_query( $params );
 		}
 
-		// init
+		// curl init
 		$curl = curl_init();
 		// set options
 		curl_setopt_array($curl, $options);
 		// execute
 		$response = curl_exec($curl);
 		$headers = curl_getinfo($curl);
-		// fetch errors
+		// fetch errors and status code
 		$errorNumber = curl_errno($curl);
 		$errorMessage = curl_error($curl);
+		$http_status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 		// close
 		curl_close($curl);
 
-		return $response;
+		
+		return array('response_code' => $http_status_code,
+		             'response' => $response);
 	}
 
 
@@ -97,11 +94,14 @@ class Incentibox {
 	public function get_useragent(){
 		return (string) 'PHP IncentiBox API Client/'. self::API_VERSION .' '. $this->user_agent;
 	}
-	private function getUsername(){
+	private function get_username(){
 		return (string) $this->username;
 	}
 	 
 	// Setters
+	private function set_username($username){
+		$this->username = (string) $username;
+	}
 	private function set_password($password){
 		$this->password = (string) $password;
 	}
@@ -111,10 +111,6 @@ class Incentibox {
 	public function set_user_agent($user_agent){
 		$this->user_agent = (string) $user_agent;
 	}
-	private function set_username($username){
-		$this->username = (string) $username;
-	}
-
 
 	/**
 	 * Returns all redeemed_rewards for the given program_id. 
@@ -131,8 +127,15 @@ class Incentibox {
 
 		$response = $this->perform_call($url, array(), true, false);
 
-		// parse the returned json
-		return json_parse($response);
+		$response_code = $response['response_code'];
+		$response = $response['response'];
+
+		// decode the returned json
+		if ($response_code == 200){
+			return json_decode($response,true);
+		} else {
+			throw new IncentiboxException($response_code . ' - ' . $response);
+		}
 	}
 }
 
