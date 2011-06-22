@@ -85,9 +85,9 @@ if ($VERBOSE) echo "Done \n";
 // Returns the # of new coupons created
 function create_new_coupons(){
 	// TABLE_COUPONS fields
-	$coupon_type = 'G'; 	// Gift voucher
+	$coupon_type = 'F'; 	// Flat discount - changed from "G" for gift voucher
 	$uses_per_coupon = 1; 	// default 1
-	$uses_per_user = 0; 	// default 0
+	$uses_per_user = 1; 	// default 0
 	$coupon_active = 'Y'; 	// default 'Y'
 	$coupon_expires_in_days = 30;
 	$coupon_minimum_order = '20.00';
