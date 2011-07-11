@@ -1,5 +1,16 @@
 <?
 /*
+ * !!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!
+ * NOTE: This has been replaced by a CREloaded module
+ * Using this script is not recommended!
+ *
+ * For more info, see:
+ * https://github.com/awaage/incentiBox-CRE-Loaded-Social-Media-Sharing-Rewards-Module
+ *
+ *
+ *
+ *
+ *
   $Id: gv_incentibox.php,v 1.0 2011/05/26, awaage for incentiBox
 
   Hooks into Gift Voucher system that's installed by default 

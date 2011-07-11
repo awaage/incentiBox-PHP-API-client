@@ -1,9 +1,7 @@
-INSTALL:
+** IMPORTANT NOTICE:
+
+This is now deprecated, for a newer incentiBox module. 
+For more info, please see https://github.com/awaage/incentiBox-CRE-Loaded-Social-Media-Sharing-Rewards-Module
 
 
-1. Place gv_incentibox.php in the admin/ directory
-2. Place incentibox.php in admin/includes/classes/ directory
-3. Add relevant indicies as noted in gv_incentibox.php
-
-This has been tested in CREloaded 6.2 - 6.4 and should also work (but untested) in OSCommerce installations.
 
